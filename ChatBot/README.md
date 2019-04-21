@@ -36,7 +36,6 @@ This bot has been created using [Microsoft Bot Framework][1]. It allow users to 
 ## Connect to the bot using Bot Framework Emulator **v4**
 - Launch Bot Framework Emulator
 - File -> Open Bot Configuration
-- Navigate to `samples/javascript_nodejs/15.handling-attachments` folder
 - Select `handling-attachments.bot` file
 
 # Attachments
