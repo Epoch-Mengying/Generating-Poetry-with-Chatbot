@@ -6,8 +6,8 @@ const axios = require('axios');
 const fs = require('fs'); // file system
 const request = require('request');
 
-// azure conigitive api
-const subscriptionKey = 'f5fce6c694ea4d5fb288cd6aa27f4234';
+// Microsoft Azure API
+const subscriptionKey = '';
 const uriBase =
     'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/analyze';
 const params = {
@@ -17,35 +17,26 @@ const params = {
 };
 
 /**
- * A bot that is able to send and receive attachments.
+ * Main ChatBot class
  */
 class AttachmentsBot {
-    /**
-     * Every conversation turn for our AttachmentsBot will call this method.
-     * There are no dialogs used, since it's "single turn" processing, meaning a single
-     * request and response, with no stateful conversation.
-     * @param turnContext A TurnContext instance containing all the data needed for processing this conversation turn.
-     */
+
     async onTurn(turnContext) {
         if (turnContext.activity.type === ActivityTypes.Message) {
-            // if user sent an attachment
+
+            // if the user sent an attachment
             if (turnContext.activity.attachments && turnContext.activity.attachments.length > 0) {
                 await this.imageInput(turnContext);
-            // if user typed strings.
+            // if user types 
             } else {
                 await this.stringInput(turnContext);
             }
 
-            // Send a HeroCard with potential options for the user to select.
-            //await this.displayOptions(turnContext);
-
-         // If the Activity is a ConversationUpdate, send a greeting message to the user.
+        // If the Activity is a ConversationUpdate, send a greeting message to the user.
         } else if (turnContext.activity.type === ActivityTypes.ConversationUpdate &&
             turnContext.activity.recipient.id !== turnContext.activity.membersAdded[0].id) {
             await turnContext.sendActivity('Welcome to the Chinese poem Generator');
             await turnContext.sendActivity('You may generate the poem by uploading a image or typing some keywords');
-            // Send a HeroCard with potential options for the user to select.
-            //await this.displayOptions(turnContext);
 
         // Respond to all other Activity types.
         } else if (turnContext.activity.type !== ActivityTypes.ConversationUpdate) {
@@ -53,27 +44,26 @@ class AttachmentsBot {
         }
     }
 
-    /**
-     * Saves incoming attachments to disk by calling `this.downloadAttachmentAndWrite()` and
-     * responds to the user with information about the saved attachment or an error.
-     * @param {Object} turnContext
+    /*
+     *  function for dealing with image imput 
      */
     async imageInput(turnContext) {
+
         // Prepare Promises to download each attachment and then execute each Promise.
         const promises = turnContext.activity.attachments.map(this.downloadAttachmentAndWrite);
         const successfulSaves = await Promise.all(promises);
 
-        // Replies back to the user with information about where the attachment is stored on the bot's server,
-        // and what the name of the saved file is.
+
         async function replyForReceivedAttachments(localAttachmentData) {
 
-            // for making async request 
+            // function for making for making asynchronous request 
             async function asyncRequest(options) {
               return new Promise((resolve, reject) => {
                 request(options, (error, response, body) => resolve({ error, response, body }));
               });
             }
 
+            // function for making for making asynchronous request. (POST request)
             async function asyncRequestPost(options) {
               return new Promise((resolve, reject) => {
                 request.post(options.url, {
@@ -82,14 +72,13 @@ class AttachmentsBot {
               });
             }
 
-
+            // If image uploaded and save, start sending request to Azure for object and scene recognition
             if (localAttachmentData) {
                 var imageUrl = './'+localAttachmentData.fileName
                 console.log()
                 const options = {
                     uri: uriBase,
                     qs: params,
-                    //body: '{"url": ' + '"' + imageUrl + '"}',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/octet-stream',
@@ -99,8 +88,6 @@ class AttachmentsBot {
                 };
 
                 let response = await asyncRequest(options);
-                //let jsonResponse = JSON.stringify(JSON.parse(response.response.body), null, '  ');
-                // string to objects
                 let azureObject = JSON.parse(response.response.body)
                 let caption = "";
                 let tags = azureObject.description.tags;
@@ -108,10 +95,11 @@ class AttachmentsBot {
                     caption = azureObject.description.captions[0].text
                 }
 
-                console.log(caption)
-                console.log(tags)
+                //console.log(caption)
+                //console.log(tags)
 
-                // call flask api
+                /* after getting reponse from Azure, start sending request to poem generater API
+                */
                 let options_poem = {
                     "url":"http://localhost:5000/todo/api/v1.0/tasks",
                     "inputString":caption,
@@ -138,8 +126,7 @@ class AttachmentsBot {
     }
 
     /**
-     * Downloads attachment to the disk.
-     * @param {Object} attachment
+     * upload images to storage
      */
     async downloadAttachmentAndWrite(attachment) {
         // Retrieve the attachment via the attachment's contentUrl.
@@ -176,20 +163,20 @@ class AttachmentsBot {
         };
     }
 
-    /**
-     * Responds to user with either an attachment or a default message indicating
-     * an unexpected input was received.
-     * @param {Object} turnContext
+    /*
+     *  function for dealing with textual inputs
      */
     async stringInput(turnContext) {
-        const reply = { type: ActivityTypes.Message };
 
+        const reply = { type: ActivityTypes.Message };
+         // function for making for making asynchronous request 
         async function asyncRequest(options) {
           return new Promise((resolve, reject) => {
             request(options, (error, response, body) => resolve({ error, response, body }));
           });
         }
 
+        // function for making for making asynchronous request. (POST request)
         async function asyncRequestPost(options) {
           return new Promise((resolve, reject) => {
             request.post(options.url, {
@@ -198,10 +185,13 @@ class AttachmentsBot {
           });
         }
 
+        // regex expression for checking if the textual input is a hyperlink
         var pattern = /^((http|https|ftp):\/\/)/;
+
+        // if it is a hyperlink, send post request to Azure API
         if(pattern.test(turnContext.activity.text)) {
             //reply.text = `You insert link '${ turnContext.activity.text }'`
-            reply.attachments = [this.getInternetAttachment2(turnContext.activity.text)];
+            reply.attachments = [this.getInternetAttachment(turnContext.activity.text)];
             var imageUrl =turnContext.activity.text;
             var options = {
                 uri: uriBase,
@@ -222,9 +212,11 @@ class AttachmentsBot {
                 caption = azureObject.description.captions[0].text
             }
 
-            console.log(caption)
-            console.log(tags)
-            // call flask api
+            //console.log(caption)
+            //console.log(tags)
+
+            /* Then send request to poem generater API
+            */
             let options_poem = {
                 "url":"http://localhost:5000/todo/api/v1.0/tasks",
                 "inputString":caption,
@@ -263,15 +255,11 @@ class AttachmentsBot {
     }
 
     /**
-     * Sends a HeroCard with choices of attachments.
+     * for card display
      * @param {Object} turnContext
      */
     async displayOptions(turnContext) {
         const reply = { type: ActivityTypes.Message };
-
-        // Note that some channels require different values to be used in order to get buttons to display text.
-        // In this code the emulator is accounted for with the 'title' parameter, but in other channels you may
-        // need to provide a value for other parameters like 'text' or 'displayText'.
         const buttons = [
             { type: ActionTypes.ImBack, title: '1. Inline Attachment', value: '1' },
             { type: ActionTypes.ImBack, title: '2. Internet Attachment', value: '2' },
@@ -286,25 +274,13 @@ class AttachmentsBot {
         await turnContext.sendActivity(reply);
     }
 
-    /**
-     * Returns an inline attachment.
-     */
-    getInlineAttachment() {
-        const imageData = fs.readFileSync(path.join(__dirname, '/resources/architecture-resize.png'));
-        const base64Image = Buffer.from(imageData).toString('base64');
-
-        return {
-            name: 'architecture-resize.png',
-            contentType: 'image/png',
-            contentUrl: `data:image/png;base64,${ base64Image }`
-        };
-    }
+}
 
 
     /**
      * Returns an attachment to be sent to the user from a HTTPS URL.
      */
-    getInternetAttachment2(link) {
+    getInternetAttachment(link) {
         // NOTE: The contentUrl must be HTTPS.
         return {
             name: 'architecture-resize.png',
@@ -313,14 +289,6 @@ class AttachmentsBot {
         };
     }
 
-    getInternetAttachment() {
-        // NOTE: The contentUrl must be HTTPS.
-        return {
-            name: 'architecture-resize.png',
-            contentType: 'image/png',
-            contentUrl: 'https://docs.microsoft.com/en-us/bot-framework/media/how-it-works/architecture-resize.png'
-        };
-    }
 
     /**
      * Returns an attachment that has been uploaded to the channel's blob storage.
