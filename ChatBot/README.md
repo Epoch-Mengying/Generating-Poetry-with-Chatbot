@@ -43,32 +43,10 @@ This bot has been created using [Microsoft Bot Framework][1]. It allow users to 
 A message exchange between user and bot may contain cards and media attachments, such as images, video, audio, and files.
 The types of attachments that may be sent and received varies by channel. Additionally, a bot may also receive file attachments.
 
-# Deploy this bot to Azure
-## Prerequisites
-- [Azure Deployment Prerequisites][41]
 
-## Provision a Bot with Azure Bot Service
-After creating the bot and testing it locally, you can deploy it to Azure to make it accessible from anywhere.  To deploy your bot to Azure:
-
-```bash
-# login to Azure
-az login
-```
-
-```bash
-# set you Azure subscription
-az account set --subscription "<azure-subscription>"
-```
-
-```bash
-# provision Azure Bot Services resources to host your bot
-msbot clone services --name "<your_bot_name>" --code-dir "." --location westus --sdkLanguage "Node" --folder deploymentScripts/msbotClone --verbose
-```
-
-### Getting Additional Help Deploying to Azure
-To learn more about deploying a bot to Azure, see [Deploy your bot to Azure][40] for a complete list of deployment instructions.
 
 # Further reading
+To learn more about creating a chatbot and deploying on the Azure cloud service, please visit the following links.
 - [Bot Framework Documentation][20]
 - [Bot Basics][32]
 - [Attachments][23]
