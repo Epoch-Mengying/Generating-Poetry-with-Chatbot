@@ -1,6 +1,6 @@
-# ChatBot for poem generator
+# The Chat Bot for poem generator
 
-This bot has been created using [Microsoft Bot Framework][1]. It allow users to retrieve generated poems by typing texutal keywords, typing hyperlink of a image or uploading image attachments.
+This bot has been created using [Microsoft Bot Framework][1]. It allows users to retrieve generated poems by typing texutal keywords, typing hyperlink of a image or uploading image attachments.
 
 ## Prerequisites
 - [Node.js][4] version 10.14 or higher
@@ -10,6 +10,7 @@ This bot has been created using [Microsoft Bot Framework][1]. It allow users to 
     ```
 
 # Start the Chatbot API
+- Claim a Microsoft Computer Vision API key from https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/
 - Clone the repository
     ```bash
     git clone https://github.com/Epoch-Mengying/Generating-Poetry-with-Chatbot.git
@@ -17,6 +18,10 @@ This bot has been created using [Microsoft Bot Framework][1]. It allow users to 
 - In a terminal, navigate to `ChatBot/`
     ```bash
     cd ChatBot/
+    ```
+- edit `bot.js` by replacing authorization key
+    ```bash
+    const subscriptionKey = 'Your Computer Vision API key'
     ```
 - Install modules
     ```bash
@@ -26,7 +31,7 @@ This bot has been created using [Microsoft Bot Framework][1]. It allow users to 
     ```bash
     npm start
     ```
-- The ChatBot API is listening on port 3748 now
+- The ChatBot API is listening on port 3978
 
 # Testing the bot using Bot Framework Emulator **v4**
 [Microsoft Bot Framework Emulator][5] is a desktop application that allows bot developers to test and debug their bots on localhost or running remotely through a tunnel.
@@ -38,9 +43,15 @@ This bot has been created using [Microsoft Bot Framework][1]. It allow users to 
 - File -> Open Bot Configuration
 - Select `handling-attachments.bot` file
 
-# Attachments
-A message exchange between user and bot may contain cards and media attachments, such as images, video, audio, and files.
-The types of attachments that may be sent and received varies by channel. Additionally, a bot may also receive file attachments.
+# Input type
+
+A message exchange between user and bot may contain cards and image attachments.The types of attachments that may be sent and received varies by channel. Additionally, a bot may also receive a hyperlink of online image or simply plain text.
+
+### Image attachments
+
+### Image hyperlinks
+
+### Textual strings (in Simplified Chinese)
 
 
 
