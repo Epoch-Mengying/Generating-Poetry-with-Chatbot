@@ -1,7 +1,6 @@
-# handling attachments sample
-Bot Framework v4 handling attachments bot sample
+# ChatBot for poem generator
 
-This bot has been created using [Microsoft Bot Framework][1], it shows how to send outgoing attachments and how to save attachments to disk.
+This bot has been created using [Microsoft Bot Framework][1]. It allow users to retrieve generated poems by typing texutal keywords, typing hyperlink of a image or uploading image attachments.
 
 ## Prerequisites
 - [Node.js][4] version 10.14 or higher
@@ -10,14 +9,14 @@ This bot has been created using [Microsoft Bot Framework][1], it shows how to se
     node --version
     ```
 
-# To try this sample
+# Start the Chatbot API
 - Clone the repository
     ```bash
-    git clone https://github.com/microsoft/botbuilder-samples.git
+    git clone https://github.com/Epoch-Mengying/Generating-Poetry-with-Chatbot.git
     ```
-- In a terminal, navigate to `samples/javascript_nodejs/15.handling-attachments`
+- In a terminal, navigate to `ChatBot/`
     ```bash
-    cd samples/javascript_nodejs/15.handling-attachments
+    cd ChatBot/
     ```
 - Install modules
     ```bash
@@ -27,6 +26,7 @@ This bot has been created using [Microsoft Bot Framework][1], it shows how to se
     ```bash
     npm start
     ```
+- The ChatBot API is listening on port 3748 now
 
 # Testing the bot using Bot Framework Emulator **v4**
 [Microsoft Bot Framework Emulator][5] is a desktop application that allows bot developers to test and debug their bots on localhost or running remotely through a tunnel.
@@ -63,14 +63,6 @@ az account set --subscription "<azure-subscription>"
 ```bash
 # provision Azure Bot Services resources to host your bot
 msbot clone services --name "<your_bot_name>" --code-dir "." --location westus --sdkLanguage "Node" --folder deploymentScripts/msbotClone --verbose
-```
-
-### Publishing Changes to Azure Bot Service
-As you make changes to your bot running locally, and want to deploy those change to Azure Bot Service, you can _publish_ those change using either `publish.cmd` if you are on Windows or `./publish` if you are on a non-Windows platform.  The following is an example of publishing
-
-```bash
-# run the publish helper (non-Windows) to update Azure Bot Service.  Use publish.cmd if running on Windows
-./publish
 ```
 
 ### Getting Additional Help Deploying to Azure
